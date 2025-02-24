@@ -1,0 +1,61 @@
+<.header>
+  <%!-- Deck {@deck.id} --%>
+  {@deck.title}
+  <:subtitle>This is a deck record from your database.</:subtitle>
+  <:actions>
+    <%!-- <.link patch={~p"/decks/#{@deck}/show/edit"} phx-click={JS.push_focus()}>
+      <.button>Edit deck</.button>
+    </.link> --%>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Title">{@deck.title}</:item>
+</.list>
+
+<.list>
+  <:item :for={flashcard <- @flashcards} title={flashcard.front_text}>
+    {flashcard.back_text}
+  </:item>
+</.list>
+
+<.back navigate={~p"/decks"}>Back to decks</.back>
+
+<.modal :if={@live_action == :edit} id="deck-modal" show on_cancel={JS.patch(~p"/decks/#{@deck}")}>
+  <.live_component
+    module={FlashcardAppWeb.DeckLive.FormComponent}
+    id={@deck.id}
+    title={@page_title}
+    action={@live_action}
+    deck={@deck}
+    patch={~p"/decks/#{@deck}"}
+  />
+</.modal>
+
+<.modal
+  :if={@live_action == :edit}
+  id="flashcard-modal"
+  show
+  on_cancel={JS.patch(~p"/flashcards/#{@flashcard}")}
+>
+  <.live_component
+    module={FlashcardAppWeb.FlashcardLive.FormComponent}
+    id={@flashcard.id}
+    title={@page_title}
+    action={@live_action}
+    flashcard={@flashcard}
+    patch={~p"/flashcards/#{@flashcard}"}
+  />
+</.modal>
+
+<.modal :if={@live_action in [:new, :edit]} id="deck-modal" show on_cancel={JS.patch(~p"/decks")}>
+  <.live_component
+    module={FlashcardAppWeb.DeckLive.FormComponent}
+    id={@deck.id || :new}
+    title={@page_title}
+    action={@live_action}
+    deck={@deck}
+    current_user={@current_user}
+    patch={~p"/decks"}
+  />
+</.modal>
