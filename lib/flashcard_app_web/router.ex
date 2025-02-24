@@ -37,7 +37,10 @@ defmodule FlashcardAppWeb.Router do
     live "/decks/:id/edit", DeckLive.Index, :edit
     live "/decks/:id", DeckLive.Show, :show
     live "/decks/:id/show/edit", DeckLive.Show, :edit
+    live "/decks/:id/flashcards/new", DeckLive.Show, :new_flashcard
+    live "/decks/:id/flashcards/:flashcard_id/edit", DeckLive.Show, :edit_flashcard
 
+    # TODO: delete below all
     live "/flashcards", FlashcardLive.Index, :index
     live "/flashcards/new", FlashcardLive.Index, :new
     live "/flashcards/:id/edit", FlashcardLive.Index, :edit

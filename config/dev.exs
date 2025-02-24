@@ -2,8 +2,8 @@ import Config
 
 # Configure your database
 config :flashcard_app, FlashcardApp.Repo,
-  username: "postgres",
-  password: "password",
+  username: "kyu",
+  password: "",
   hostname: "localhost",
   database: "flashcard_app_dev",
   stacktrace: true,

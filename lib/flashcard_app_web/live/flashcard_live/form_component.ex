@@ -2,6 +2,7 @@ defmodule FlashcardAppWeb.FlashcardLive.FormComponent do
   use FlashcardAppWeb, :live_component
 
   alias FlashcardApp.Cards
+  # alias FlashcardApp.Cards.Flashcard
 
   @impl true
   def render(assigns) do
@@ -45,8 +46,43 @@ defmodule FlashcardAppWeb.FlashcardLive.FormComponent do
     {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
   end
 
+  @impl true
   def handle_event("save", %{"flashcard" => flashcard_params}, socket) do
-    save_flashcard(socket, socket.assigns.action, flashcard_params)
+    # case Cards.update_flashcard(socket.assigns.flashcard, flashcard_params) do
+    #   {:ok, flashcard} ->
+    #     notify_parent({:saved, flashcard})
+    #     {:noreply, push_patch(socket, to: ~p"/decks/#{socket.assigns.deck.id}")}
+
+    #   {:error, changeset} ->
+    #     {:noreply, assign(socket, form: to_form(changeset))}
+    # end
+
+    case socket.assigns.flashcard.id do
+      nil ->
+        # If the flashcard ID is nil, create a new flashcard
+        flashcard_params_with_deck = Map.put(flashcard_params, "deck_id", socket.assigns.deck.id)
+        IO.inspect(flashcard_params_with_deck)
+
+        case Cards.create_flashcard(flashcard_params_with_deck) do
+          {:ok, flashcard} ->
+            notify_parent({:saved, flashcard})
+            {:noreply, push_patch(socket, to: ~p"/decks/#{socket.assigns.deck.id}")}
+
+          {:error, changeset} ->
+            {:noreply, assign(socket, form: to_form(changeset))}
+        end
+
+      _id ->
+        # If the flashcard ID exists, update the existing flashcard
+        case Cards.update_flashcard(socket.assigns.flashcard, flashcard_params) do
+          {:ok, flashcard} ->
+            notify_parent({:saved, flashcard})
+            {:noreply, push_patch(socket, to: ~p"/decks/#{socket.assigns.deck.id}")}
+
+          {:error, changeset} ->
+            {:noreply, assign(socket, form: to_form(changeset))}
+        end
+    end
   end
 
   defp save_flashcard(socket, :edit, flashcard_params) do
